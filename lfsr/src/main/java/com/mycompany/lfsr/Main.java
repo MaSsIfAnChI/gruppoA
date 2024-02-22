@@ -7,7 +7,8 @@ package com.mycompany.lfsr;
 /**
  *
  * @author massi
- */import java.util.Base64;
+ */
+import java.util.Base64;
 import java.util.Scanner;
 
 public class Main {
@@ -25,8 +26,7 @@ public class Main {
 
         short i = (short) 0b1010101010101010;  // Cambiato da int a short
 
-        Lfsr lfsr;
-        lfsr = new Lfsr(chiaveBase64.hashCode(), i);
+        Lfsr lfsr = new Lfsr(chiaveBase64.hashCode(), i);
 
         byte[] criptato = input.getBytes();
         for (int j = 0; j < criptato.length; j++) {
@@ -35,7 +35,8 @@ public class Main {
 
         System.out.println("Testo criptato: " + new String(criptato));
 
-        lfsr = new Lfsr(chiaveBase64.hashCode(), i);
+        lfsr.reset(); // Aggiunto metodo reset per riportare il registro allo stato iniziale
+
         byte[] decriptato = criptato.clone();
         for (int j = 0; j < decriptato.length; j++) {
             decriptato[j] ^= lfsr.genera(8);
