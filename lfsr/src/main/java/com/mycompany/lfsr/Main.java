@@ -4,61 +4,46 @@
  */
 package com.mycompany.lfsr;
 
-import java.util.Scanner;
-
 /**
  *
  * @author massi
- */
+ */import java.util.Base64;
+import java.util.Scanner;
+
 public class Main {
 
-
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);  // crea un nuovo scanner per leggere l'input
+        Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Inserisci il testo da crittografare:");
+        String input = scanner.nextLine();
 
-        System.out.println("Inserisci il testo da crittografare:");  // Chiede all'utente di inserire il testo da crittografare
-        String input = scanner.nextLine();  // Legge il testo da crittografare.
+        System.out.println("Inserisci la chiave di crittografia:");
+        String chiaveStringa = scanner.nextLine();
+        byte[] chiaveBytes = chiaveStringa.getBytes();
+        String chiaveBase64 = Base64.getEncoder().encodeToString(chiaveBytes);
 
+        short i = (short) 0b1010101010101010;  // Cambiato da int a short
 
-        System.out.println("Inserisci la chiave di crittografia:");  // Chiede all'utente di inserire la chiave
-        String chiaveStringa = scanner.nextLine();  // Legge la chiave
-        int chiave = chiaveStringa.hashCode();  // Converte la chiave in un intero utilizzando il metodo hashCode()
+        Lfsr lfsr;
+        lfsr = new Lfsr(chiaveBase64.hashCode(), i);
 
-
-        int i = 0b10101010101010101010101010101010;  // Definisce la i, 0b=binario, determina i bit nel registro che vengono utilizzati per calcolare il nuovo bit da inserire nel registro, un bit viene utilizzato se è impostato a 1 quindi ogni bit in posizione dispari nel registro viene utilizzato per calcolare il nuovo bit, Questo nuovo bit viene inserito all’inizio del registro, mentre tutti gli altri bit vengono spostati di una posizione a destra.
-
-
-        Lfsr Lfsr = new Lfsr(chiave, i);  // Crea un nuovo oggetto lfsr con la chiave e la posizione
-
-
-        // Crittografia
-        byte[] criptato = input.getBytes();  // Converte la stringa di input in un array di byte
-        for (int j = 0; j < criptato.length; j++) {  // Per ogni byte-->
-            criptato[j] ^= Lfsr.genera(8);  // -->esegue l'operazione XOR con un byte generato dal registro a scorrimento
+        byte[] criptato = input.getBytes();
+        for (int j = 0; j < criptato.length; j++) {
+            criptato[j] ^= lfsr.genera(8);
         }
-
 
         System.out.println("Testo criptato: " + new String(criptato));
 
-
-        // Decrittografia
-        Lfsr = new Lfsr(chiave, i);  // Crea un nuovo lfsr con la stessa chiave e la stessa i per resettare lo stato del registro
-        byte[] decriptato = criptato.clone();  // Crea una copia dell'array criptato
-        for (int j = 0; j < decriptato.length; j++) {  // Per ogni byte-->
-            decriptato[j] ^= Lfsr.genera(8);  // -->esegue l'operazione XOR con un byte generato dal registro a scorrimento.
+        lfsr = new Lfsr(chiaveBase64.hashCode(), i);
+        byte[] decriptato = criptato.clone();
+        for (int j = 0; j < decriptato.length; j++) {
+            decriptato[j] ^= lfsr.genera(8);
         }
-
 
         System.out.println("Testo decriptato: " + new String(decriptato));
 
-
-        // Dopo la crittografia o la decriptazione
-        int periodo = Lfsr.calcola_periodo();
+        int periodo = lfsr.calcola_periodo();
         System.out.println("Periodo del registro a scorrimento: " + periodo);
-
-
     }
 }
-
-
