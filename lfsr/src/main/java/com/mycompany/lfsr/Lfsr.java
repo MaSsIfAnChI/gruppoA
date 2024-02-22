@@ -7,21 +7,23 @@ package com.mycompany.lfsr;
 /**
  *
  * @author massi
- */import java.util.Base64;
-
-public class Lfsr {
+ */
+class Lfsr {
     private short statoRegistro;  // Cambiato da int a short
+    private short statoIniziale;  // Aggiunto stato iniziale
+
     private short i;  // Cambiato da int a short
 
     public Lfsr(int statoRegistro, short i) {
         this.statoRegistro = (short) statoRegistro;
+        this.statoIniziale = this.statoRegistro;
         this.i = i;
     }
 
     public int passo() {
         int nuovoBit = Integer.bitCount(statoRegistro & i) % 2;
-        statoRegistro = (short) ((statoRegistro >>> 1) | (nuovoBit << 15));  // Cambiato da 31 a 15
-        System.out.println("Stato del registro: " + String.format("%16s", Integer.toBinaryString(statoRegistro)).replace(' ', '0'));
+        statoRegistro = (short) ((statoRegistro >>> 1) | (nuovoBit << 15));
+        System.out.println("Stato del registro: " + String.format("%16s", Integer.toBinaryString(statoRegistro & 0xFFFF)).replace(' ', '0'));
         return nuovoBit;
     }
 
@@ -34,14 +36,17 @@ public class Lfsr {
     }
 
     public int calcola_periodo() {
-        short statoIniziale = statoRegistro;
         int periodo = 0;
 
         do {
             passo();
             periodo++;
-        } while (statoRegistro != statoIniziale && periodo < (1 << 16));
+        } while (statoRegistro != statoIniziale && periodo < (1 << 15));
 
         return periodo;
+    }
+
+    public void reset() {
+        statoRegistro = statoIniziale;
     }
 }
